@@ -11,9 +11,13 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.welas.horosapp.databinding.FragmentHoroscopeBinding
+import com.welas.horosapp.domain.model.HoroscopeInfo
+import com.welas.horosapp.domain.model.HoroscopeInfo.*
+import com.welas.horosapp.domain.model.HoroscopeModel
 import com.welas.horosapp.ui.horoscope.adapter.HoroscopeAdapter
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collect
@@ -41,7 +45,22 @@ class HoroscopeFragment : Fragment() {
 
     private fun initList() {
         horoscopeAdapter = HoroscopeAdapter(onItemSelected = {
-            Toast.makeText(context, getString(it.name), Toast.LENGTH_LONG).show()
+            val type = when (it) {
+                Acuario -> HoroscopeModel.Acuario
+                Aries -> HoroscopeModel.Aries
+                Cancer -> HoroscopeModel.Cancer
+                Escorpio -> HoroscopeModel.Escorpio
+                Geminis -> HoroscopeModel.Geminis
+                Leo -> HoroscopeModel.Leo
+                Libra -> HoroscopeModel.Libra
+                Piscis -> HoroscopeModel.Piscis
+                Sagitario -> HoroscopeModel.Sagitario
+                Tauro -> HoroscopeModel.Tauro
+                Virgo -> HoroscopeModel.Virgo
+            }
+            findNavController().navigate(
+                HoroscopeFragmentDirections.actionHoroscopeFragmentToHoroscopeDetailActivity(type)
+            )
         })
 
         binding.rvHoroscope.apply {
@@ -56,7 +75,6 @@ class HoroscopeFragment : Fragment() {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 horoscopeViewModel.horoscope.collect {
                     horoscopeAdapter.updatedList(it)
-                    Log.i("welassi", it.toString())
                 }
             }
         }
