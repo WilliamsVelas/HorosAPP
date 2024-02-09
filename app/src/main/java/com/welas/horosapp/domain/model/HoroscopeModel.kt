@@ -2,14 +2,14 @@ package com.welas.horosapp.domain.model
 
 enum class HoroscopeModel {
     Aries,
-    Tauro,
-    Acuario,
+    Taurus,
+    Aquarius,
     Cancer,
-    Escorpio,
-    Geminis,
+    Scorpio,
+    Gemini,
     Leo,
     Libra,
-    Piscis,
-    Sagitario,
+    Pisces,
+    Sagittarius,
     Virgo
 }
