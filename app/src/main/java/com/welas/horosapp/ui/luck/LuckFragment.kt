@@ -1,6 +1,8 @@
 package com.welas.horosapp.ui.luck
 
 import android.animation.ObjectAnimator
+import android.annotation.SuppressLint
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -14,8 +16,11 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import com.welas.horosapp.R
 import com.welas.horosapp.databinding.FragmentLuckBinding
+import com.welas.horosapp.ui.core.listeners.OnSwipeTouchListener
+import com.welas.horosapp.ui.providers.RandomCardProvider
 import dagger.hilt.android.AndroidEntryPoint
 import java.util.Random
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class LuckFragment : Fragment() {
@@ -23,19 +28,59 @@ class LuckFragment : Fragment() {
     private var _binding: FragmentLuckBinding? = null
     private val binding get() = _binding!!
 
+    @Inject
+    lateinit var randomCardProvider: RandomCardProvider
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         initUI()
     }
 
     private fun initUI() {
+        preparePredictions()
         initListeners()
     }
 
-    private fun initListeners() {
-        binding.ivRoulette.setOnClickListener {
-            spinRoulette()
+    private fun preparePredictions() {
+        val currentluck = randomCardProvider.getLucky()
+        currentluck?.let { luck ->
+            val currentPrediction = getString(luck.text)
+
+            binding.tvLuck.text = currentPrediction
+            binding.ivLuckCard.setImageResource(luck.image)
+            binding.tvShare.setOnClickListener {
+                shareResult(currentPrediction)
+            }
         }
+    }
+
+    private fun shareResult(prediction: String) {
+        val sendIntent: Intent = Intent().apply {
+            action = Intent.ACTION_SEND
+            putExtra(Intent.EXTRA_TEXT, prediction)
+            type = "text/plain"
+        }
+
+        val shareIntent = Intent.createChooser(sendIntent, null)
+        startActivity(shareIntent)
+    }
+
+    @SuppressLint("ClickableViewAccessibility")
+    private fun initListeners() {
+//        binding.ivRoulette.setOnClickListener {
+//            spinRoulette()
+//        }
+
+        binding.ivRoulette.setOnTouchListener(object : OnSwipeTouchListener(requireContext()) {
+
+            override fun onSwipeRight() {
+                spinRoulette()
+            }
+
+            override fun onSwipeLeft() {
+                spinRoulette()
+            }
+        })
     }
 
     private fun spinRoulette() {
